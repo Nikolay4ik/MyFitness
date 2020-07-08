@@ -1,7 +1,13 @@
 package com.example.myfitness.Data;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+
+@Entity(tableName = "timetables")
 public class Timetable {
 
+@PrimaryKey(autoGenerate = true)
     private int id;
     private String name;
     private String description;
@@ -21,7 +27,7 @@ public class Timetable {
         this.endTime = endTime;
         this.weekDay = weekDay;
     }
-
+@Ignore
     public Timetable(String name, String description, String place, String teacher, String startTime, String endTime, int weekDay) {
         this.name = name;
         this.description = description;
@@ -31,6 +37,7 @@ public class Timetable {
         this.endTime = endTime;
         this.weekDay = weekDay;
     }
+
 
     public int getId() {
         return id;

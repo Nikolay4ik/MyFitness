@@ -1,7 +1,12 @@
 package com.example.myfitness.Utils;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -16,35 +21,50 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 public class NetworkUtils {
     private static String BASE_URL = "https://sample.fitnesskit-admin.ru/schedule/get_group_lessons_v2/1/";
-    private  static String PARAMS_NAME = "name";
-    private static String PARAMS_PLACE="place";
-    private static String PARAMS_DISCRIPTION = "description";
-    private static String PARAMS_TEACHER = "teacher";
-    private static String PARAMS_START_TIME = "startTime";
-    private  static String PARAMS_END_TIME = "endTime";
-    private  static String PARAMS_ID="id";
-    private  static String PARAMS_WEEK_DAY="weekDay";
 
-    
+    public static JSONArray jsonObjectTask() {
+        JSONArray result = null;
+        try {
+            result = new DowlandTask().execute(BASE_URL).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+public static class JsonLoader extends AsyncTaskLoader<JSONArray>{
+    public JsonLoader(@NonNull Context context, Bundle bundle) {
+        super(context);
+    }
+
+    @Nullable
+    @Override
+    public JSONArray loadInBackground() {
+        return null;
+    }
+}
 
 
-
-    public static class DowlandTask extends AsyncTask<URL, Void,JSONArray> {
+    public static class DowlandTask extends AsyncTask<String, Void, JSONArray> {
 
         @Override
-        public JSONArray doInBackground(URL... urls) {
-            if (urls==null|| urls.length==0){
-                return  null;
+        public JSONArray doInBackground(String... strings) {
+            if (strings == null || strings.length == 0) {
+                return null;
             }
             StringBuilder builder = new StringBuilder();
             JSONArray result = null;
             HttpURLConnection urlConnection = null;
-
+            URL url = null;
             try {
-                urlConnection = (HttpURLConnection) urls[0].openConnection();
+                url = new URL(strings[0]);
+                urlConnection = (HttpURLConnection) url.openConnection();
                 InputStream in = urlConnection.getInputStream();
                 InputStreamReader reader = new InputStreamReader(in);
                 BufferedReader bufferedReader = new BufferedReader(reader);
@@ -53,7 +73,7 @@ public class NetworkUtils {
                     builder.append(line);
                     line = bufferedReader.readLine();
                 }
-                result=new JSONArray(builder.toString());
+                result = new JSONArray(builder.toString());
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -71,4 +91,7 @@ public class NetworkUtils {
 
     }
 
+
 }
+
+
